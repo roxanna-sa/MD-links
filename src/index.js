@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import { routeVerification,
 convertToAbsoluteRoute,
 isFileMd,
@@ -15,35 +16,35 @@ function mdlinks(path, options) {
 
     //verificar que la variable path no sea null
     if (path === null || path === undefined || path === '') {
-      console.log('Error: no existe una ruta');
-      reject('Error: no existe una ruta');
+      console.log(chalk.bgRed.bold('Error: There is no route'));
+      reject('Error: There is no route');
       return;
     }
 
     //verificar que la ruta existe
     const valid = routeVerification(path);
     if (!valid) {
-      console.log('La ruta no existe');
-      reject('La ruta no existe');
+      console.log(chalk.red('Error: Path does not exist'));
+      reject('Error: Path does not exist');
       return;
     }
 
     //verificar si ruta es absoluta, en caso de que no, transformar.
     const absolutePath = convertToAbsoluteRoute(path);
-    console.log(`Ruta absoluta: ${absolutePath}`); //*borrar a futuro
+    console.log(`Absolute route: ${absolutePath}`); //*borrar a futuro
 
     const isDirectoryResult = isADirectory(absolutePath);
-    console.log(`¿Es un directorio?: ${isDirectoryResult}`); //*borrar a futuro
+    console.log(chalk.blue.underline.bold(`¿Is a directory?: ${isDirectoryResult}`)); //*borrar a futuro
 
     if (isDirectoryResult) {
       processFilesRecursively(routes,absolutePath); 
     } else {
       // Si es un archivo...
       const isAFileMd = isFileMd(absolutePath);
-      console.log(`¿Es un archivo .md?: ${isAFileMd}`);
+      console.log(`¿Is it a .md?: ${isAFileMd}`);
       if (!isAFileMd) {
-        console.log('No es un archivo md');
-        reject('No es un archivo md');
+        console.log('It is not a .md file');
+        reject('It is not a .md file');
         return;
       }
 
@@ -52,8 +53,8 @@ function mdlinks(path, options) {
 
     // ¿Existen archivos .md por procesar?
     if (routes.length === 0){
-      console.log('Error. No hay archivos .md');
-      reject ('Error. No hay archivos .md');
+      console.log('"Error: There are no .md files');
+      reject ('"Error: There are no .md files');
     }
 
     // Procesar el próximo archivo del listado
@@ -82,20 +83,3 @@ mdlinks('../md files')
 .then(res => console.log(res))
 .catch(error => console.log('error', error));
 
-/*
-
-// probando si funciona es un directorio?
-const dirPath = '../src';
-const isDirectoryResult = isADirectory(dirPath);
-console.log(`¿Es un directorio?: ${isDirectoryResult}`);
-
-//probar si funciona read a file
-const fileRoute = '../testing-links.md';
-
-readAFile(fileRoute)
-  .then((data) => {
-    console.log(`Contenido del archivo: ${data}`);
-  })
-  .catch((error) => {
-    console.error(`Error al leer el archivo: ${error}`);
-  });*/
