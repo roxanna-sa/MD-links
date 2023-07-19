@@ -11,6 +11,7 @@ processFilesRecursively
 function mdlinks(path, options) {
   return new Promise((resolve, reject) => {
     const routes = [];
+    const links = [];
 
     //verificar que la variable path no sea null
     if (path === null || path === undefined || path === '') {
@@ -57,16 +58,18 @@ function mdlinks(path, options) {
 
     // Procesar el próximo archivo del listado
     for (const currentMdFile of routes){
+      // Add function to add all links to the array with the following code:
+
       console.log(currentMdFile)
-      hasLinks(currentMdFile).then(isThereALink => {
-        console.log("isThereALink?:", isThereALink);
+      hasLinks(currentMdFile)
+      .then(isThereALink => {
+        console.log(`isThereALink in ${currentMdFile}?:`, isThereALink);
+        if (!isThereALink){
+          return; // Termina la ejecución del .then
+        }
+
+        console.log("si había links, continuar")
       })
-      // console.log(`${currentMdFile} hasLinks?`, isThereALink);
-      // if(!isThereALink){
-      //   continue; // Pasa al siguiente archivo si el actual no tenía links
-      // }
-
-
     }
 
     resolve(routes);
