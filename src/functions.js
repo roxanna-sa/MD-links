@@ -77,42 +77,51 @@ export function getSubdirectories(directory) {
 }
 
 //Leer archivo (comprobar si tiene links)
-export const readAFile = (filePath) => new Promise((resolve, reject) => {
+export const readAFile = (filePath) => {
+  let dataRes = null;
   fs.readFile(filePath, 'utf-8', (error, data) => {
-    if (error) {
-      reject(error);
-    } else {
-      resolve(data);
+    if (!error) {
+      return data;
     }
   });
-});
+}
 
 //obtener links
 export const getLinks = (filePath) => new Promise((resolve, reject) => {
   const newLinksMd = [];
-  readAFile(filePath)
-  .then((data) => {
-    const regex = /\[(.+?)\]\((https?:\/\/[^\s)]+)\)/g;
-    let match = regex.exec(data);
-    //si el archivo contiene Links debe retornar un array de links
-    while (match != null) {
-      newLinksMd.push({
-        href: match[2], //almacena el valor de la segunda coincidencia capturada por la expresión regular. El segundo grupo capturado corresponde a la URL del enlace.
-        text: match[1], //almacena el valor de la primera coincidencia capturada por la expresión regular. El primer grupo capturado corresponde al texto del enlace
-        file: filePath, //almacena el valor del parámetro filePath que se pasó a la función getLinks. Representa la ruta del archivo en el que se encontró el enlace.
-      });
-      match = regex.exec(data);
+
+  fs.readFile(filePath, 'utf-8', (error, data) => {
+    try{  
+      if (error){
+        reject(error);
+      }
+      
+      const regex = /\[(.+?)\].*(https?:\/\/[^\s)]+)\)/g;
+      let match = regex.exec(data);
+      //si el archivo contiene Links debe retornar un array de links
+      while (match != null) {
+        newLinksMd.push({
+          href: match[2], //almacena el valor de la segunda coincidencia capturada por la expresión regular. El segundo grupo capturado corresponde a la URL del enlace.
+          text: match[1], //almacena el valor de la primera coincidencia capturada por la expresión regular. El primer grupo capturado corresponde al texto del enlace
+          file: filePath, //almacena el valor del parámetro filePath que se pasó a la función getLinks. Representa la ruta del archivo en el que se encontró el enlace.
+        });
+        match = regex.exec(data);
+      }
+      resolve(newLinksMd);
+    }catch(error){
+      reject(error);
     }
-    resolve(newLinksMd);
-  })
-  .catch((error) => reject(error));
+  });
 });
 
 export const hasLinks = (filePath) => new Promise((resolve, reject) => {
   getLinks(filePath)
   .then(files => {
-    console.log("haslinks files", files);
-    resolve(files.length > 0);
+    if (files.length > 0){
+      resolve(true);
+    }else{
+      resolve(false);
+    }
   })
   .catch(error => {
     reject(error);
