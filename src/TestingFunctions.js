@@ -8,7 +8,9 @@ import {
   hasSubdirectories,
   getMdFilesFromDir,
   getSubdirectories,
-  isAFile
+  isAFile,
+  getLinks,
+  hasLinks
 } from "./functions.js";
 import fs from 'fs';
 
@@ -71,4 +73,11 @@ if (hasSubdirectories(folderPath)) {
  console.log(getMdFilesFromDir(folderPath));
  console.log(getSubdirectories(folderPath));
  */
- console.log(readAFile(`C:/Users/Roxana/Desktop/Laboratoria Proyects/MD-links/md files/testing-links.md`));
+
+ getLinks(`C:/Users/Roxana/Desktop/Laboratoria Proyects/MD-links/md files/testing-links.md`).then(links => {
+  console.log("links", links);
+ })
+
+ hasLinks(`C:/Users/Roxana/Desktop/Laboratoria Proyects/MD-links/md files/testing-links.md`).then(hasLinks => {
+  console.log("hasLinks", hasLinks);
+ })
