@@ -1,5 +1,7 @@
 import fs from 'fs';
 import path from 'path';
+import chalk from 'chalk';
+import axios from 'axios';
 
 // Verificar si la ruta !== null
 export function routeVerification(path) {
@@ -77,62 +79,196 @@ export function getSubdirectories(directory) {
 }
 
 //Leer archivo (comprobar si tiene links)
-export const readAFile = (filePath) => {
+/*export const readAFile = (filePath) => {
   let dataRes = null;
   fs.readFile(filePath, 'utf-8', (error, data) => {
     if (!error) {
       return data;
     }
   });
-}
+}*/
 
 //obtener links
 export const getLinks = (filePath) => new Promise((resolve, reject) => {
   const newLinksMd = [];
 
   fs.readFile(filePath, 'utf-8', (error, data) => {
-    try{  
-      if (error){
+    try {
+      if (error) {
         reject(error);
       }
-      
+
       const regex = /\[(.+?)\].*(https?:\/\/[^\s)]+)\)/g;
       let match = regex.exec(data);
       //si el archivo contiene Links debe retornar un array de links
       while (match != null) {
         newLinksMd.push({
-          href: match[2], //almacena el valor de la segunda coincidencia capturada por la expresión regular. El segundo grupo capturado corresponde a la URL del enlace.
+          href: match[2].replace(/"/g, ""), //almacena el valor de la segunda coincidencia capturada por la expresión regular. El segundo grupo capturado corresponde a la URL del enlace.
           text: match[1], //almacena el valor de la primera coincidencia capturada por la expresión regular. El primer grupo capturado corresponde al texto del enlace
           file: filePath, //almacena el valor del parámetro filePath que se pasó a la función getLinks. Representa la ruta del archivo en el que se encontró el enlace.
         });
         match = regex.exec(data);
       }
       resolve(newLinksMd);
-    }catch(error){
+    } catch (error) {
       reject(error);
     }
   });
 });
 
-export const hasLinks = (filePath) => new Promise((resolve, reject) => {
+/*export const hasLinks = (filePath) => new Promise((resolve, reject) => {
   getLinks(filePath)
-  .then(files => {
-    if (files.length > 0){
-      resolve(true);
-    }else{
-      resolve(false);
-    }
-  })
-  .catch(error => {
-    reject(error);
-  })
-});
+    .then(files => {
+      if (files.length > 0) {
+        resolve(true);
+      } else {
+        resolve(false);
+      }
+    })
+    .catch(error => {
+      reject(error);
+    })
+});*/
 
-export const processFilesRecursively = (routes, absolutePath) => { 
+export const processFilesRecursively = (routes, absolutePath) => {
   console.log('absolutePath', absolutePath);
   routes.push(...getMdFilesFromDir(absolutePath))
   const subdirectories = getSubdirectories(absolutePath);
   subdirectories.forEach(directory => {
-    processFilesRecursively(routes,directory);
+    processFilesRecursively(routes, directory);
   });
 }
+
+
+export const getMDFileRoutes = (path, routes) => {
+  //verificar si ruta es absoluta, en caso de que no, transformar.
+  const absolutePath = convertToAbsoluteRoute(path);
+  console.log(`Absolute route: ${absolutePath}`); //*borrar a futuro
+
+  const isDirectoryResult = isADirectory(absolutePath);
+  console.log(chalk.blue.underline.bold(`¿Is a directory?: ${isDirectoryResult}`)); //*borrar a futuro
+
+  if (isDirectoryResult) {
+    processFilesRecursively(routes, absolutePath);
+  } else {
+    // Si es un archivo...
+    const isAFileMd = isFileMd(absolutePath);
+    console.log(`¿Is it a .md?: ${isAFileMd}`);
+    if (!isAFileMd) {
+      console.log('It is not a .md file');
+      reject('It is not a .md file');
+      return;
+    }
+
+    routes.push(absolutePath);
+  }
+}
+
+/*export const getLinksInMDFiles = (routes, links, options) => new Promise((resolve, reject) => {
+  // ¿Existen archivos .md por procesar?
+  if (routes.length === 0) {
+    console.log('"Error: There are no .md files');
+    reject('"Error: There are no .md files');
+  }
+
+  // Procesar el próximo archivo del listado
+  for (const currentMdFile of routes) {
+    // Add function to add all links to the array with the following code:
+    console.log(currentMdFile)
+    getLinks(currentMdFile)
+    .then(linksInFile => {
+      links.push(...linksInFile);
+    })
+    .finally(() => {
+      // Una vez que tengamos todo... ble ble ble
+      for (const link of links) {
+        if (options.validate) {
+          // Validar vía HTTP
+        }else {
+          console.log(`href: ${link.href}\ntext: ${link.text}.\nfile: ${link.file}.\n`);
+        }
+      }
+
+      resolve(links);
+    });
+  }
+});*/
+// Obtener los enlaces en un archivo MD
+export const getLinksInFile = (currentMdFile) => {
+  return getLinks(currentMdFile)
+    .catch(error => {
+      console.error('Error processing links in file:', error);
+      return [];
+    });
+};
+
+// Realizar la validación para un array de enlaces
+export const validateLinks = (links) => {
+  const linkValidations = links.map(link => validate(link));
+  return Promise.all(linkValidations)
+    .then(validations => {
+      validations.forEach(validation => {
+        console.log(`href: ${validation.href}`);
+        console.log(`text: ${validation.text}`);
+        console.log(`file: ${validation.file}`);
+        console.log(`status: ${validation.status}`);
+        console.log(`ok: ${validation.ok}`);
+        console.log('--------------------------');
+      });
+      return links;
+    })
+    .catch(error => {
+      console.error('Error during link validation:', error);
+      return links;
+    });
+};
+
+// Obtener los links en los archivos MD y validarlos si es necesario
+export const getLinksAndValidate = (routes, options) => {
+  if (routes.length === 0) {
+    console.log('"Error: There are no .md files');
+    return Promise.reject('"Error: There are no .md files');
+  }
+
+  const linksPromises = routes.map(currentMdFile => getLinksInFile(currentMdFile));
+  return Promise.all(linksPromises)
+    .then(linksArray => linksArray.flat())
+    .then(links => {
+      if (options.validate) {
+        return validateLinks(links);
+      } else {
+        links.forEach(link => {
+          console.log(`href: ${link.href}\ntext: ${link.text}.\nfile: ${link.file}.\n`);
+        });
+        return links;
+      }
+    });
+};
+
+export const validate = (link) => axios.get(link.href)
+  .then(response => ({
+    href: link.href,
+    text: link.text,
+    file: link.file,
+    status: response.status,
+    ok: response.status >= 200 && response.status < 400 ? 'ok' : 'fail'
+  }))
+  .catch(error => ({
+    href: link.href,
+    text: link.text,
+    file: link.file,
+    status: error.response ? error.response.status : null,
+    ok: 'fail'
+}));
+
+export const areLinksRemaining = (routes, links, processedRoutes) => {
+  if (routes.length === 0 && links.length === 0) {
+    return false;
+  }
+
+  if (routes.length > 0) {
+    return true;
+  }
+
+  return processedRoutes.some(route => !route.processed);
+};
