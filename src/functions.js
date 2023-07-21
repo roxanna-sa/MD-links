@@ -130,6 +130,11 @@ export const getLinks = (filePath) => new Promise((resolve, reject) => {
     })
 });*/
 
+/**
+ * 
+ * @param {*} routes - arreglo donde guardaremos las rutas (se pasa como referencia)
+ * @param {*} absolutePath - donde estamos procesando
+ */
 export const processFilesRecursively = (routes, absolutePath) => {
   console.log('absolutePath', absolutePath);
   routes.push(...getMdFilesFromDir(absolutePath))
@@ -202,18 +207,39 @@ export const getLinksInFile = (currentMdFile) => {
     });
 };
 
+export const validate = (link) => axios.get(link.href)
+  .then(response => ({
+    href: link.href,
+    text: link.text,
+    file: link.file,
+    status: response.status,
+    ok: response.status >= 200 && response.status < 400 ? 'ok' : 'fail'
+  }))
+  .catch(error => ({
+    href: link.href,
+    text: link.text,
+    file: link.file,
+    status: error.response ? error.response.status : null,
+    ok: 'fail'
+  }));
+
+
 // Realizar la validación para un array de enlaces
 export const validateLinks = (links) => {
   const linkValidations = links.map(link => validate(link));
   return Promise.all(linkValidations)
     .then(validations => {
-      validations.forEach(validation => {
+      validations.forEach((validation, index) => {
         console.log(`href: ${validation.href}`);
         console.log(`text: ${validation.text}`);
         console.log(`file: ${validation.file}`);
         console.log(`status: ${validation.status}`);
         console.log(`ok: ${validation.ok}`);
         console.log('--------------------------');
+
+        // Agregar validaciones a link que es lo que se devuelve al usuario que usó finalmente:
+        links[index]["status"] = validation.status;
+        links[index]["ok"] = validation.ok;
       });
       return links;
     })
@@ -245,23 +271,8 @@ export const getLinksAndValidate = (routes, options) => {
     });
 };
 
-export const validate = (link) => axios.get(link.href)
-  .then(response => ({
-    href: link.href,
-    text: link.text,
-    file: link.file,
-    status: response.status,
-    ok: response.status >= 200 && response.status < 400 ? 'ok' : 'fail'
-  }))
-  .catch(error => ({
-    href: link.href,
-    text: link.text,
-    file: link.file,
-    status: error.response ? error.response.status : null,
-    ok: 'fail'
-}));
 
-export const areLinksRemaining = (routes, links, processedRoutes) => {
+/*export const areLinksRemaining = (routes, links, processedRoutes) => {
   if (routes.length === 0 && links.length === 0) {
     return false;
   }
@@ -271,4 +282,23 @@ export const areLinksRemaining = (routes, links, processedRoutes) => {
   }
 
   return processedRoutes.some(route => !route.processed);
+};*/
+
+export const calculateStats = (links, options) => {
+  if (!options.stats) {
+    return;
+  }
+
+  const uniqueLinksSet = new Set(links.map((link) => link.href));
+  const uniqueLinks = [...uniqueLinksSet];
+
+  console.log(`Total: ${links.length}`);
+  console.log(`Unique: ${uniqueLinks.length}`);
+
+  if (options.validate) {
+    const brokenLinks = links.filter((link) => link.ok === 'fail');
+    const uniqueBrokenLinksSet = new Set(brokenLinks.map((link) => link.href));
+    const uniqueBrokenLinks = [...uniqueBrokenLinksSet];
+    console.log(`Broken: ${uniqueBrokenLinks.length}`);
+  }
 };
