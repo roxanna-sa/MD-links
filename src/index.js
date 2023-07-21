@@ -2,11 +2,14 @@ import chalk from "chalk";
 import { routeVerification,
 getMDFileRoutes,
 getLinksAndValidate,
-areLinksRemaining
+calculateStats
 } from "./functions.js";
 
 const path = '../md files/';
-const options = { validate: true };
+const options = { 
+  validate: true,
+  stats: true
+};
 
 function mdlinks(path, options) {
   return new Promise((resolve, reject) => {
@@ -36,6 +39,9 @@ function mdlinks(path, options) {
 
     getLinksAndValidate(routes, options)
       .then(links => {
+
+        calculateStats(links, options);
+
         resolve(links);
       })
       .catch(error => {
@@ -50,11 +56,8 @@ function mdlinks(path, options) {
 // Obtener las rutas antes de llamar a mdlinks
 const routes = [];
 
-// Llamamos a mdlinks con la opción validate adecuada
+// Llamamos a mdlinks con la opción validate 
 mdlinks(path, options)
-  .then(() => console.log(areLinksRemaining([], [], routes))
-    ? "Aún quedan enlaces por procesar."
-    : "Todos los enlaces han sido procesados.")
   .then(message => console.log(message))
   .catch(error => console.log('error on call - ', error));
 
