@@ -78,16 +78,6 @@ export function getSubdirectories(directory) {
   return directories.map(subDirectory => convertToAbsoluteRoute(path.join(directory, subDirectory)));
 }
 
-//Leer archivo (comprobar si tiene links)
-/*export const readAFile = (filePath) => {
-  let dataRes = null;
-  fs.readFile(filePath, 'utf-8', (error, data) => {
-    if (!error) {
-      return data;
-    }
-  });
-}*/
-
 //obtener links
 export const getLinks = (filePath) => new Promise((resolve, reject) => {
   const newLinksMd = [];
@@ -116,20 +106,6 @@ export const getLinks = (filePath) => new Promise((resolve, reject) => {
   });
 });
 
-/*export const hasLinks = (filePath) => new Promise((resolve, reject) => {
-  getLinks(filePath)
-    .then(files => {
-      if (files.length > 0) {
-        resolve(true);
-      } else {
-        resolve(false);
-      }
-    })
-    .catch(error => {
-      reject(error);
-    })
-});*/
-
 /**
  * 
  * @param {*} routes - arreglo donde guardaremos las rutas (se pasa como referencia)
@@ -143,7 +119,6 @@ export const processFilesRecursively = (routes, absolutePath) => {
     processFilesRecursively(routes, directory);
   });
 }
-
 
 export const getMDFileRoutes = (path, routes) => {
   //verificar si ruta es absoluta, en caso de que no, transformar.
@@ -169,35 +144,6 @@ export const getMDFileRoutes = (path, routes) => {
   }
 }
 
-/*export const getLinksInMDFiles = (routes, links, options) => new Promise((resolve, reject) => {
-  // ¿Existen archivos .md por procesar?
-  if (routes.length === 0) {
-    console.log('"Error: There are no .md files');
-    reject('"Error: There are no .md files');
-  }
-
-  // Procesar el próximo archivo del listado
-  for (const currentMdFile of routes) {
-    // Add function to add all links to the array with the following code:
-    console.log(currentMdFile)
-    getLinks(currentMdFile)
-    .then(linksInFile => {
-      links.push(...linksInFile);
-    })
-    .finally(() => {
-      // Una vez que tengamos todo... ble ble ble
-      for (const link of links) {
-        if (options.validate) {
-          // Validar vía HTTP
-        }else {
-          console.log(`href: ${link.href}\ntext: ${link.text}.\nfile: ${link.file}.\n`);
-        }
-      }
-
-      resolve(links);
-    });
-  }
-});*/
 // Obtener los enlaces en un archivo MD
 export const getLinksInFile = (currentMdFile) => {
   return getLinks(currentMdFile)
@@ -222,7 +168,6 @@ export const validate = (link) => axios.get(link.href)
     status: error.response ? error.response.status : null,
     ok: 'fail'
   }));
-
 
 // Realizar la validación para un array de enlaces
 export const validateLinks = (links) => {
@@ -271,19 +216,6 @@ export const getLinksAndValidate = (routes, options) => {
     });
 };
 
-
-/*export const areLinksRemaining = (routes, links, processedRoutes) => {
-  if (routes.length === 0 && links.length === 0) {
-    return false;
-  }
-
-  if (routes.length > 0) {
-    return true;
-  }
-
-  return processedRoutes.some(route => !route.processed);
-};*/
-
 export const calculateStats = (links, options) => {
   if (!options.stats) {
     return;
@@ -302,3 +234,11 @@ export const calculateStats = (links, options) => {
     console.log(`Broken: ${uniqueBrokenLinks.length}`);
   }
 };
+
+// Truncar el largo a 50 char
+export function truncateText(text) {
+  if (text.length <= 50) {
+    return text;
+  }
+  return `${text.slice(0, 50)}...`;
+}

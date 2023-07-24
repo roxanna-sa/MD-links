@@ -5,22 +5,17 @@ getLinksAndValidate,
 calculateStats
 } from "./functions.js";
 
-const path = '../md files/';
-const options = { 
-  validate: true,
-  stats: true
-};
 
-function mdlinks(path, options) {
+export function mdlinks(path, options) {
   return new Promise((resolve, reject) => {
     const routes = [];
-    const links = [];
+    /*const links = [];
     if (options == null){
       options = {
         validate: false,
         stats: false
       }
-    }
+    }*/
     //verificar que la variable path no sea null
     if (path === null || path === undefined || path === '') {
       console.log(chalk.bgRed.bold('Error: There is no route'));
@@ -51,19 +46,15 @@ function mdlinks(path, options) {
   });
 }
 
-  
-
-// Obtener las rutas antes de llamar a mdlinks
-const routes = [];
-
+/*const path = '../md files/';
+const options = { 
+  validate: true,
+  stats: true
+};
 // Llamamos a mdlinks con la opción validate 
 mdlinks(path, options)
   .then(message => console.log(message))
-  .catch(error => console.log('error on call - ', error));
+  .catch(error => console.log('Call status - ', error));*/
 
-//mdlinks();
-/*mdlinks('../md files/', { validate: true })
-  .then(res => console.log("final sin log c:"))
-  .catch(error => console.log('error on call - ', error));*/
 
 
