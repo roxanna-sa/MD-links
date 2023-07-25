@@ -1,8 +1,7 @@
 #!/usr/bin/env node
-
-import { mdlinks } from "./index.js";
-import { calculateStats } from "./functions.js";
 import figlet from "figlet";
+import { mdlinks } from "./index.js";
+
 
 // Función para mostrar el mensaje de MDlinks en ASCII art
 const showBanner = () => {
@@ -40,8 +39,8 @@ mdlinks(path, options)
         console.log(`${file} ${href} ${text}`);
       }
     });
-    if (options.stats) {
+    /*if (options.stats) {
       calculateStats(links, options);
-    }
+    }*/
   })
   .catch((error) => console.log('Error:', error));
