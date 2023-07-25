@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import chalk from 'chalk';
 import axios from 'axios';
 
 // Verificar si la ruta !== null
@@ -18,17 +17,10 @@ export const convertToAbsoluteRoute = (filePath) => {
   if (path.isAbsolute(filePath)) {
     return filePath;
   } else {
-    const absolutePath = (path.join(process.cwd(), filePath));
-    return absolutePath;
+    return path.resolve(filePath)
 
   }
 };
-
-// Revisar si es un archivo //No es necesaria esta funcion
-export function isAFile(pathUser) {
-  const fileDetails = fs.statSync(pathUser);
-  return fileDetails.isFile();
-}
 
 // Validar si es un archivo md
 export const isFileMd = (filePath) => {
@@ -42,7 +34,7 @@ export function isADirectory(pathUser) {
 }
 
 //Obtener los archivos md de la carpeta
-export function getFilesFromDir(folderPath) {
+/*export function getFilesFromDir(folderPath) {
   try {
     const fileNames = fs.readdirSync(folderPath);
     const filePaths = fileNames.map(fileName =>
@@ -53,7 +45,7 @@ export function getFilesFromDir(folderPath) {
     console.error('Error al obtener los archivos:', error);
     return [];
   }
-}
+}*/
 
 export function getMdFilesFromDir(folderPath) {
   try {
@@ -126,7 +118,7 @@ export const getMDFileRoutes = (path, routes) => {
   console.log(`Absolute route: ${absolutePath}`); //*borrar a futuro
 
   const isDirectoryResult = isADirectory(absolutePath);
-  console.log(chalk.blue.underline.bold(`¿Is a directory?: ${isDirectoryResult}`)); //*borrar a futuro
+  console.log((`¿Is a directory?: ${isDirectoryResult}`)); //*borrar a futuro
 
   if (isDirectoryResult) {
     processFilesRecursively(routes, absolutePath);

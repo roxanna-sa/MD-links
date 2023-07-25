@@ -15,7 +15,7 @@ import {
 } from "./functions.js";
 import fs from 'fs';
 
-/*
+
 // probando si funciona validar existencia de ruta, en index.js va la función mdlinks
 const route = './functions.js';
 const valid = routeVerification(route);
@@ -79,10 +79,3 @@ if (hasSubdirectories(folderPath)) {
   console.log("links", links);
  })
 
- hasLinks(`C:/Users/Roxana/Desktop/Laboratoria Proyects/MD-links/md files/testing-links.md`).then(hasLinks => {
-  console.log("hasLinks", hasLinks);
- })
-
- */
-
- console.log(getLinksv2('C:/Users/Roxana/Desktop/Laboratoria Proyects/MD-links/md files/testing-links.md'));
