@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import chalk from 'chalk';
 import axios from 'axios';
 
 // Verificar si la ruta !== null
@@ -18,17 +17,10 @@ export const convertToAbsoluteRoute = (filePath) => {
   if (path.isAbsolute(filePath)) {
     return filePath;
   } else {
-    const absolutePath = (path.join(process.cwd(), filePath));
-    return absolutePath;
+    return path.resolve(filePath)
 
   }
 };
-
-// Revisar si es un archivo //No es necesaria esta funcion
-export function isAFile(pathUser) {
-  const fileDetails = fs.statSync(pathUser);
-  return fileDetails.isFile();
-}
 
 // Validar si es un archivo md
 export const isFileMd = (filePath) => {
@@ -39,20 +31,6 @@ export const isFileMd = (filePath) => {
 export function isADirectory(pathUser) {
   const infoDir = fs.statSync(pathUser);
   return infoDir.isDirectory();
-}
-
-//Obtener los archivos md de la carpeta
-export function getFilesFromDir(folderPath) {
-  try {
-    const fileNames = fs.readdirSync(folderPath);
-    const filePaths = fileNames.map(fileName =>
-      path.join(folderPath, fileName)
-    );
-    return filePaths;
-  } catch (error) {
-    console.error('Error al obtener los archivos:', error);
-    return [];
-  }
 }
 
 export function getMdFilesFromDir(folderPath) {
@@ -77,16 +55,6 @@ export function getSubdirectories(directory) {
   const directories = fs.readdirSync(directory).filter(item => fs.lstatSync(`${directory}/${item}`).isDirectory());
   return directories.map(subDirectory => convertToAbsoluteRoute(path.join(directory, subDirectory)));
 }
-
-//Leer archivo (comprobar si tiene links)
-/*export const readAFile = (filePath) => {
-  let dataRes = null;
-  fs.readFile(filePath, 'utf-8', (error, data) => {
-    if (!error) {
-      return data;
-    }
-  });
-}*/
 
 //obtener links
 export const getLinks = (filePath) => new Promise((resolve, reject) => {
@@ -116,27 +84,12 @@ export const getLinks = (filePath) => new Promise((resolve, reject) => {
   });
 });
 
-/*export const hasLinks = (filePath) => new Promise((resolve, reject) => {
-  getLinks(filePath)
-    .then(files => {
-      if (files.length > 0) {
-        resolve(true);
-      } else {
-        resolve(false);
-      }
-    })
-    .catch(error => {
-      reject(error);
-    })
-});*/
-
 /**
  * 
  * @param {*} routes - arreglo donde guardaremos las rutas (se pasa como referencia)
  * @param {*} absolutePath - donde estamos procesando
  */
 export const processFilesRecursively = (routes, absolutePath) => {
-  console.log('absolutePath', absolutePath);
   routes.push(...getMdFilesFromDir(absolutePath))
   const subdirectories = getSubdirectories(absolutePath);
   subdirectories.forEach(directory => {
@@ -144,23 +97,22 @@ export const processFilesRecursively = (routes, absolutePath) => {
   });
 }
 
-
 export const getMDFileRoutes = (path, routes) => {
   //verificar si ruta es absoluta, en caso de que no, transformar.
   const absolutePath = convertToAbsoluteRoute(path);
-  console.log(`Absolute route: ${absolutePath}`); //*borrar a futuro
+  //console.log(`Absolute route: ${absolutePath}`); //*borrar a futuro
 
   const isDirectoryResult = isADirectory(absolutePath);
-  console.log(chalk.blue.underline.bold(`¿Is a directory?: ${isDirectoryResult}`)); //*borrar a futuro
+  //console.log((`¿Is a directory?: ${isDirectoryResult}`)); //*borrar a futuro
 
   if (isDirectoryResult) {
     processFilesRecursively(routes, absolutePath);
   } else {
     // Si es un archivo...
     const isAFileMd = isFileMd(absolutePath);
-    console.log(`¿Is it a .md?: ${isAFileMd}`);
+    //console.log(`¿Is it a .md?: ${isAFileMd}`);
     if (!isAFileMd) {
-      console.log('It is not a .md file');
+      //console.log('It is not a .md file');
       reject('It is not a .md file');
       return;
     }
@@ -169,40 +121,11 @@ export const getMDFileRoutes = (path, routes) => {
   }
 }
 
-/*export const getLinksInMDFiles = (routes, links, options) => new Promise((resolve, reject) => {
-  // ¿Existen archivos .md por procesar?
-  if (routes.length === 0) {
-    console.log('"Error: There are no .md files');
-    reject('"Error: There are no .md files');
-  }
-
-  // Procesar el próximo archivo del listado
-  for (const currentMdFile of routes) {
-    // Add function to add all links to the array with the following code:
-    console.log(currentMdFile)
-    getLinks(currentMdFile)
-    .then(linksInFile => {
-      links.push(...linksInFile);
-    })
-    .finally(() => {
-      // Una vez que tengamos todo... ble ble ble
-      for (const link of links) {
-        if (options.validate) {
-          // Validar vía HTTP
-        }else {
-          console.log(`href: ${link.href}\ntext: ${link.text}.\nfile: ${link.file}.\n`);
-        }
-      }
-
-      resolve(links);
-    });
-  }
-});*/
 // Obtener los enlaces en un archivo MD
 export const getLinksInFile = (currentMdFile) => {
   return getLinks(currentMdFile)
     .catch(error => {
-      console.error('Error processing links in file:', error);
+      console.error('Error al obtener links en el archivo:', error);
       return [];
     });
 };
@@ -223,20 +146,12 @@ export const validate = (link) => axios.get(link.href)
     ok: 'fail'
   }));
 
-
 // Realizar la validación para un array de enlaces
 export const validateLinks = (links) => {
   const linkValidations = links.map(link => validate(link));
   return Promise.all(linkValidations)
     .then(validations => {
       validations.forEach((validation, index) => {
-        console.log(`href: ${validation.href}`);
-        console.log(`text: ${validation.text}`);
-        console.log(`file: ${validation.file}`);
-        console.log(`status: ${validation.status}`);
-        console.log(`ok: ${validation.ok}`);
-        console.log('--------------------------');
-
         // Agregar validaciones a link que es lo que se devuelve al usuario que usó finalmente:
         links[index]["status"] = validation.status;
         links[index]["ok"] = validation.ok;
@@ -252,7 +167,6 @@ export const validateLinks = (links) => {
 // Obtener los links en los archivos MD y validarlos si es necesario
 export const getLinksAndValidate = (routes, options) => {
   if (routes.length === 0) {
-    console.log('"Error: There are no .md files');
     return Promise.reject('"Error: There are no .md files');
   }
 
@@ -263,26 +177,10 @@ export const getLinksAndValidate = (routes, options) => {
       if (options.validate) {
         return validateLinks(links);
       } else {
-        links.forEach(link => {
-          console.log(`href: ${link.href}\ntext: ${link.text}.\nfile: ${link.file}.\n`);
-        });
         return links;
       }
     });
 };
-
-
-/*export const areLinksRemaining = (routes, links, processedRoutes) => {
-  if (routes.length === 0 && links.length === 0) {
-    return false;
-  }
-
-  if (routes.length > 0) {
-    return true;
-  }
-
-  return processedRoutes.some(route => !route.processed);
-};*/
 
 export const calculateStats = (links, options) => {
   if (!options.stats) {
@@ -302,3 +200,17 @@ export const calculateStats = (links, options) => {
     console.log(`Broken: ${uniqueBrokenLinks.length}`);
   }
 };
+
+// Truncar el largo a 50 char
+export function truncateText(text) {
+  if (text.length <= 50) {
+    return text;
+  }
+  
+  const truncatedText = text.slice(0, 50);
+  if (truncatedText.endsWith('...')) {
+    return truncatedText.slice(0, -3);
+  }
+
+  return `${truncatedText}...`;
+}
