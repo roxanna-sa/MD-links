@@ -33,20 +33,6 @@ export function isADirectory(pathUser) {
   return infoDir.isDirectory();
 }
 
-//Obtener los archivos md de la carpeta
-/*export function getFilesFromDir(folderPath) {
-  try {
-    const fileNames = fs.readdirSync(folderPath);
-    const filePaths = fileNames.map(fileName =>
-      path.join(folderPath, fileName)
-    );
-    return filePaths;
-  } catch (error) {
-    console.error('Error al obtener los archivos:', error);
-    return [];
-  }
-}*/
-
 export function getMdFilesFromDir(folderPath) {
   try {
     const fileNames = fs.readdirSync(folderPath).filter(x => x.endsWith('.md'));
@@ -104,7 +90,7 @@ export const getLinks = (filePath) => new Promise((resolve, reject) => {
  * @param {*} absolutePath - donde estamos procesando
  */
 export const processFilesRecursively = (routes, absolutePath) => {
-  console.log('absolutePath', absolutePath);
+  //console.log('absolutePath', absolutePath);
   routes.push(...getMdFilesFromDir(absolutePath))
   const subdirectories = getSubdirectories(absolutePath);
   subdirectories.forEach(directory => {
@@ -115,19 +101,19 @@ export const processFilesRecursively = (routes, absolutePath) => {
 export const getMDFileRoutes = (path, routes) => {
   //verificar si ruta es absoluta, en caso de que no, transformar.
   const absolutePath = convertToAbsoluteRoute(path);
-  console.log(`Absolute route: ${absolutePath}`); //*borrar a futuro
+  //console.log(`Absolute route: ${absolutePath}`); //*borrar a futuro
 
   const isDirectoryResult = isADirectory(absolutePath);
-  console.log((`¿Is a directory?: ${isDirectoryResult}`)); //*borrar a futuro
+  //console.log((`¿Is a directory?: ${isDirectoryResult}`)); //*borrar a futuro
 
   if (isDirectoryResult) {
     processFilesRecursively(routes, absolutePath);
   } else {
     // Si es un archivo...
     const isAFileMd = isFileMd(absolutePath);
-    console.log(`¿Is it a .md?: ${isAFileMd}`);
+    //console.log(`¿Is it a .md?: ${isAFileMd}`);
     if (!isAFileMd) {
-      console.log('It is not a .md file');
+      //console.log('It is not a .md file');
       reject('It is not a .md file');
       return;
     }
@@ -140,7 +126,7 @@ export const getMDFileRoutes = (path, routes) => {
 export const getLinksInFile = (currentMdFile) => {
   return getLinks(currentMdFile)
     .catch(error => {
-      console.error('Error processing links in file:', error);
+      console.error('Error al obtener links en el archivo:', error);
       return [];
     });
 };
@@ -167,13 +153,6 @@ export const validateLinks = (links) => {
   return Promise.all(linkValidations)
     .then(validations => {
       validations.forEach((validation, index) => {
-        console.log(`href: ${validation.href}`);
-        console.log(`text: ${validation.text}`);
-        console.log(`file: ${validation.file}`);
-        console.log(`status: ${validation.status}`);
-        console.log(`ok: ${validation.ok}`);
-        console.log('--------------------------');
-
         // Agregar validaciones a link que es lo que se devuelve al usuario que usó finalmente:
         links[index]["status"] = validation.status;
         links[index]["ok"] = validation.ok;
@@ -189,7 +168,6 @@ export const validateLinks = (links) => {
 // Obtener los links en los archivos MD y validarlos si es necesario
 export const getLinksAndValidate = (routes, options) => {
   if (routes.length === 0) {
-    console.log('"Error: There are no .md files');
     return Promise.reject('"Error: There are no .md files');
   }
 
@@ -200,9 +178,6 @@ export const getLinksAndValidate = (routes, options) => {
       if (options.validate) {
         return validateLinks(links);
       } else {
-        links.forEach(link => {
-          console.log(`href: ${link.href}\ntext: ${link.text}.\nfile: ${link.file}.\n`);
-        });
         return links;
       }
     });
