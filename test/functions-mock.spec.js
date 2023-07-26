@@ -1,7 +1,7 @@
 import { validateLinks } from '../src/functions';
 
 test('should update status and ok properties for each link', async () => {
-  // Creamos dos objetos link con las propiedades esperadas
+  // Crear dos objetos link con las propiedades esperadas
   const link1 = {
     href: 'https://github.com/roxanna-sa/MD-links/blob/main/src/blob.js',
     text: 'Ro',
@@ -33,10 +33,10 @@ test('should update status and ok properties for each link', async () => {
     }),
   }));
 
-  // Realizamos la validación de los enlaces
+  // Realizar la validación de los enlaces
   const result = await validateLinks(links);
 
-  // Comprobamos que los enlaces se hayan actualizado correctamente con los resultados de la validación
+  // Comprobar que los enlaces se hayan actualizado correctamente con los resultados de la validación
   expect(result).toEqual([
     {
       href: 'https://github.com/roxanna-sa/MD-links/blob/main/src/blob.js',

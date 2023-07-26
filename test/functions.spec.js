@@ -16,20 +16,24 @@ import {
 import path from 'path';
 import fs from 'fs'
 
-test('La función routeVerification retorna true cuando la ruta existe', () => {
-  const existingPath = './src';
-  const result = routeVerification(existingPath);
+// ROUTE VERIFICATION
+describe('routeVerification' , () => {
+  test('routeVerification returns true when there is an existing path', () => {
+    const existingPath = './src';
+    const result = routeVerification(existingPath);
+  
+    expect(result).toBe(true);
+  });
+  
+  test('routeVerification returns false when the path does not exist', () => {
+    const nonExistentPath = '../hello.js';
+    const result = routeVerification(nonExistentPath);
+  
+    expect(result).toBe(false);
+  });
+})
 
-  expect(result).toBe(true);
-});
-
-test('La función routeVerification retorna false cuando la ruta no existe', () => {
-  const nonExistentPath = '../hello.js';
-  const result = routeVerification(nonExistentPath);
-
-  expect(result).toBe(false);
-});
-
+// CONVERT TO ABSOLUTE ROUTE
 describe('convertToAbsoluteRoute', () => {
   test('should return the absolute path when given an absolute path', () => {
 
@@ -46,6 +50,7 @@ describe('convertToAbsoluteRoute', () => {
   });
 });
 
+// IS FILE MD
 describe('isFileMd', () => {
   it('should return true when the file has a .md extension', () => {
     const filePath = './md-files/test1/testing-links2.md';
@@ -69,52 +74,49 @@ describe('isFileMd', () => {
   });
 });
 
+// IS A DIRECTORY
 describe('isADirectory', () => {
   const testFolderPath = path.resolve('./test-folder'); // Carpeta de prueba
-  const nonExistentFolderPath = path.resolve('./nonexistent-folder'); // Carpeta que no existe
 
   beforeAll(() => {
-    // Creamos la carpeta de prueba antes de todas las pruebas
+    // Crea la carpeta de prueba antes de todas las pruebas
     fs.mkdirSync(testFolderPath, { recursive: true });
   });
 
   afterAll(() => {
-    // Eliminamos la carpeta de prueba después de todas las pruebas
+    // Elimina la carpeta de prueba después de todas las pruebas
     fs.rmdirSync(testFolderPath, { recursive: true });
   });
 
   it('should return true when the path points to a directory', () => {
-    // Act
+ 
     const result = isADirectory(testFolderPath);
 
-    // Assert
     expect(result).toBe(true);
   });
 
   it('should return false when the path points to a file', () => {
-    // Arrange
+ 
     const filePath = path.join(testFolderPath, 'test-file.txt');
     fs.writeFileSync(filePath, 'This is a test file.');
 
-    // Act
     const result = isADirectory(filePath);
 
-    // Assert
     expect(result).toBe(false);
   });
 });
 
-
+// GET MD FILES FROM DIR
 describe('getMdFilesFromDir', () => {
   beforeEach(() => {
-    // Create a temporary folder for each test
+    // Crea una carpeta temporal para testear
     if (!fs.existsSync('./test-folder')) {
       fs.mkdirSync('./test-folder');
     }
   });
 
   afterEach(() => {
-    // Remove the temporary folder and files after each test
+    // Quita la carpeta temporal después de cada prueba
     fs.rmdirSync('./test-folder', { recursive: true });
   });
 
@@ -137,7 +139,7 @@ describe('getMdFilesFromDir', () => {
     const folderPath = './test-folder';
     const fileNames = ['file1.txt', 'file2.js'];
 
-    // Create test files inside the temporary folder
+    // Crea archivo de prueba dentro de la carpeta
     fileNames.forEach(fileName => {
       fs.writeFileSync(path.join(folderPath, fileName), '');
     });
@@ -156,20 +158,19 @@ describe('getMdFilesFromDir', () => {
   });
 });
 
+// HAS SUBDIRECTORIES
 describe('hasSubdirectories', () => {
   it('should return true when the directory contains subdirectories', () => {
-    // Arrange
+
     const directoryPath = './test-folder';
     const subdirectoryName = 'subdir';
 
-    // Create a temporary folder and a subdirectory inside it for the test
+    // Crea una carpeta y un subdirectorio temporal para el test
     fs.mkdirSync(directoryPath);
     fs.mkdirSync(`${directoryPath}/${subdirectoryName}`);
 
-    // Act
     const result = hasSubdirectories(directoryPath);
 
-    // Assert
     expect(result).toBe(true);
 
     // Cleanup
@@ -178,16 +179,14 @@ describe('hasSubdirectories', () => {
   });
 
   it('should return false when the directory does not contain subdirectories', () => {
-    // Arrange
+
     const directoryPath = './test-folder';
 
-    // Create a temporary folder for the test
+    // Crea una carpeta temporal para el test
     fs.mkdirSync(directoryPath);
 
-    // Act
     const result = hasSubdirectories(directoryPath);
 
-    // Assert
     expect(result).toBe(false);
 
     // Cleanup
@@ -196,52 +195,50 @@ describe('hasSubdirectories', () => {
 
 });
 
+//GET SUBDIRECTORIES
 describe('getSubdirectories', () => {
   beforeEach(() => {
-    // Creamos una carpeta temporal antes de cada prueba
+    // Crea una carpeta temporal antes de cada prueba
     fs.mkdirSync('./test-folder');
   });
 
   afterEach(() => {
-    // Eliminamos la carpeta temporal después de cada prueba
+    // Elimina la carpeta temporal después de cada prueba
     fs.rmdirSync('./test-folder', { recursive: true });
   });
 
   it('should return an array of absolute paths to subdirectories when given a valid directory path', () => {
-    // Arrange
+  
     const directoryPath = './test-folder';
     const subdirectoryNames = ['subdir1', 'subdir2', 'subdir3'];
 
-    // Creamos los subdirectorios dentro de la carpeta temporal para la prueba
+    // Crea los subdirectorios dentro de la carpeta temporal para la prueba
     subdirectoryNames.forEach(subdirName => fs.mkdirSync(`${directoryPath}/${subdirName}`));
 
-    // Act
     const result = getSubdirectories(directoryPath);
 
-    // Assert
     const expectedPaths = subdirectoryNames.map(subdir => convertToAbsoluteRoute(`${directoryPath}/${subdir}`));
     expect(result).toEqual(expectedPaths);
   });
 
   it('should return an empty array when given a directory with no subdirectories', () => {
-    // Arrange
+
     const directoryPath = './test-folder';
 
-    // Act
     const result = getSubdirectories(directoryPath);
 
-    // Assert
     expect(result).toEqual([]);
   });
 
 });
 
+//PROCESS FILES RECURSIVELY
 describe('processFilesRecursively', () => {
   // Directorio temporal para las pruebas
   let tempDir;
   let tempDirUnique;
 
-  // Creamos el directorio temporal una vez antes de todas las pruebas
+  // Crear el directorio temporal una vez antes de todas las pruebas
   beforeAll(() => {
     tempDir = path.resolve('./temp-dir');
     if (!fs.existsSync(tempDir)) {
@@ -250,23 +247,23 @@ describe('processFilesRecursively', () => {
   });
 
   beforeEach(() => {
-    // Creamos un directorio temporal único para cada prueba usando un identificador único
+    // Crear un directorio temporal único para cada prueba usando un identificador único
     tempDirUnique = path.resolve(`./temp-dir-${Date.now()}`);
     fs.mkdirSync(tempDirUnique);
   });
 
   afterEach(() => {
-    // Eliminamos el directorio temporal después de cada prueba
+    // Eliminar el directorio temporal después de cada prueba
     fs.rmdirSync(tempDirUnique, { recursive: true });
   });
 
   afterAll(() => {
-    // Eliminamos el directorio temporal creado antes de todas las pruebas
+    // Eliminar el directorio temporal creado antes de todas las pruebas
     fs.rmdirSync(tempDir, { recursive: true });
   });
 
   it('should process files and subdirectories recursively', () => {
-    // Creamos una estructura de directorios de prueba
+    // Crear una estructura de directorios de prueba
     const root = {
       name: 'root',
       files: ['file1.md', 'file2.md'],
@@ -288,7 +285,7 @@ describe('processFilesRecursively', () => {
     function createDirectory(directory, parentPath = '') {
       const { name, files, subdirectories } = directory;
       const directoryPath = path.join(tempDirUnique, parentPath, name);
-      // Creamos el directorio actual
+      // Crear el directorio actual
       fs.mkdirSync(directoryPath);
 
       // Agregar los archivos del directorio actual
@@ -311,10 +308,8 @@ describe('processFilesRecursively', () => {
     // Definir un arreglo para almacenar las rutas de los archivos encontrados
     const routes = [];
 
-    // Act
     processFilesRecursively(routes, absoluteRoot);
 
-    // Assert
     expect(routes).toEqual([
       path.join(tempDirUnique, 'root/file1.md'),
       path.join(tempDirUnique, 'root/file2.md'),
@@ -331,21 +326,19 @@ describe('processFilesRecursively', () => {
     const emptyDir = path.join(tempDir, 'empty-dir');
     fs.mkdirSync(emptyDir);
 
-    // Act
     processFilesRecursively(routes, emptyDir);
 
-    // Assert
     expect(routes).toEqual([]);
   });
 });
 
 
-
+// GET MD FILE ROUTES
 describe('getMDFileRoutes', () => {
   // Directorio temporal para las pruebas
   let tempDir;
 
-  // Creamos el directorio temporal una vez antes de todas las pruebas
+  // Crear el directorio temporal una vez antes de todas las pruebas
   beforeAll(() => {
     tempDir = path.resolve('./temp-dir');
     if (!fs.existsSync(tempDir)) {
@@ -354,18 +347,18 @@ describe('getMDFileRoutes', () => {
   });
 
   beforeEach(() => {
-    // Limpiamos el directorio temporal antes de cada prueba
+    // Limpiar el directorio temporal antes de cada prueba
     fs.rmdirSync(tempDir, { recursive: true });
     fs.mkdirSync(tempDir);
   });
 
   afterAll(() => {
-    // Eliminamos el directorio temporal después de todas las pruebas
+    // Eliminar el directorio temporal después de todas las pruebas
     fs.rmdirSync(tempDir, { recursive: true });
   });
 
   it('should add all .md file routes in the directory and its subdirectories to the routes array', () => {
-    // Creamos una estructura de directorios de prueba
+    // Crear una estructura de directorios de prueba
     const root = {
       name: 'root',
       files: ['file1.md', 'file2.md'],
@@ -387,7 +380,7 @@ describe('getMDFileRoutes', () => {
     function createDirectory(directory, parentPath = '') {
       const { name, files, subdirectories } = directory;
       const directoryPath = path.join(tempDir, parentPath, name);
-      // Creamos el directorio actual
+      // Crear el directorio actual
       fs.mkdirSync(directoryPath);
 
       // Agregar los archivos del directorio actual
@@ -410,10 +403,8 @@ describe('getMDFileRoutes', () => {
     // Definir un arreglo para almacenar las rutas de los archivos encontrados
     const routes = [];
 
-    // Act
     getMDFileRoutes(absoluteRoot, routes);
 
-    // Assert
     expect(routes).toEqual([
       path.join(tempDir, 'root/file1.md'),
       path.join(tempDir, 'root/file2.md'),
@@ -432,10 +423,8 @@ describe('getMDFileRoutes', () => {
     // Definir un arreglo para almacenar las rutas de los archivos encontrados
     const routes = [];
 
-    // Act
     getMDFileRoutes(absoluteFilePath, routes);
 
-    // Assert
     expect(routes).toEqual([absoluteFilePath]);
   });
 
@@ -443,7 +432,7 @@ describe('getMDFileRoutes', () => {
     // Ruta que no existe
     const nonExistentPath = path.join(tempDir, 'nonexistent');
 
-    // Verificamos si la carpeta no existe y la creamos
+    // Verificar si la carpeta no existe y la creamos
     if (!fs.existsSync(nonExistentPath)) {
       fs.mkdirSync(nonExistentPath);
     }
@@ -451,19 +440,18 @@ describe('getMDFileRoutes', () => {
     // Definir un arreglo para almacenar las rutas de los archivos encontrados
     const routes = [];
 
-    // Act
     getMDFileRoutes(nonExistentPath, routes);
 
-    // Assert
     expect(routes).toEqual([]);
   });
 });
 
+// GET LINKS IN FILE
 describe('getLinksInFile', () => {
   // Directorio temporal para las pruebas
   let tempDir;
 
-  // Creamos el directorio temporal una vez antes de todas las pruebas
+  // Crear el directorio temporal una vez antes de todas las pruebas
   beforeAll(() => {
     tempDir = path.resolve('./temp-dir');
     if (!fs.existsSync(tempDir)) {
@@ -472,13 +460,13 @@ describe('getLinksInFile', () => {
   });
 
   beforeEach(() => {
-    // Limpiamos el directorio temporal antes de cada prueba
+    // Limpiar el directorio temporal antes de cada prueba
     fs.rmdirSync(tempDir, { recursive: true });
     fs.mkdirSync(tempDir);
   });
 
   afterAll(() => {
-    // Eliminamos el directorio temporal después de todas las pruebas
+    // Eliminar el directorio temporal después de todas las pruebas
     fs.rmdirSync(tempDir, { recursive: true });
   });
 
@@ -493,13 +481,12 @@ describe('getLinksInFile', () => {
       [Link 2](https://www.google.com)
     `;
 
-    // Creamos el archivo .md
+    // Crear el archivo .md
     fs.writeFileSync(absoluteFilePath, mdContent);
 
-    // Act
     return getLinksInFile(absoluteFilePath)
       .then((links) => {
-        // Assert
+      
         expect(links).toEqual([
           {
             href: 'https://www.example.com',
@@ -524,10 +511,9 @@ describe('getLinksInFile', () => {
       This is a sample Markdown file without links.
     `;
 
-    // Creamos el archivo .md
+    // Crear el archivo .md
     fs.writeFileSync(absoluteFilePath, mdContent);
 
-    // Act
     return getLinksInFile(absoluteFilePath)
       .then((links) => {
         // Assert
@@ -539,7 +525,6 @@ describe('getLinksInFile', () => {
     // Ruta absoluta del archivo .md
     const absoluteFilePath = path.join(tempDir, 'nonexistent.md');
 
-    // Act
     return getLinksInFile(absoluteFilePath)
       .catch((error) => {
         // Assert
@@ -548,6 +533,7 @@ describe('getLinksInFile', () => {
   });
 });
 
+// VALIDATE
 describe('validate', () => {
 
   test('should be a function', async () => {
@@ -595,6 +581,9 @@ describe('validate', () => {
     expect(result2).toEqual(expectedResponse[1]);
   });
 });
+
+
+// CALCULATE STATS
 
 function captureConsoleOutput(callback) {
   const originalConsoleLog = console.log;
@@ -666,6 +655,7 @@ describe('calculateStats', () => {
   });
 });
 
+// TRUNCATE TEXT TO 50 CHAR
 describe('truncateText', () => {
   test('should return the same text when its length is less than or equal to 50', () => {
     const text1 = 'This is a short text.';
