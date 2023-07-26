@@ -2,7 +2,7 @@
 import figlet from "figlet";
 import chalk from "chalk";
 import { mdlinks } from "./index.js";
-import { calculateStats } from "./functions.js";
+import { calculateStats, truncateText } from "./functions.js";
 
 
 // Función para mostrar el mensaje de MDlinks en ASCII art
@@ -34,7 +34,7 @@ mdlinks(path, options)
     // Imprimimos por pantalla el resultado del proceso
     links.forEach(validation => {
       console.log(`href: ${validation.href}`);
-      console.log(`text: ${validation.text}`);
+      console.log(truncateText(`text: ${validation.text}`));
       console.log(`file: ${validation.file}`);
       if (options.validate){
         console.log(`status: ${validation.status}`);
