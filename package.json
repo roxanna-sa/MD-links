@@ -20,7 +20,8 @@
     "stylelint": "stylelint --aei src/**/*.css",
     "test": "jest --coverage",
     "start": "babel-node src/index.js",
-    "build": "babel src/index.js -d dist",
+    "build": "babel src -d lib",
+    "prepublishOnly": "npm run build",
     "cli": "babel-node src/cli.js"
   },
   "keywords": [],
