@@ -1,34 +1,56 @@
-import axios from 'axios';
-import { getLinksInFile,
-validate } from '../src/functions.js';
+import { validateLinks } from '../src/functions';
 
-// Mock de la función getLinks
-jest.mock('../src/functions', () => ({
-  getLinksInFile: jest.fn(),
-}));
+test('should update status and ok properties for each link', async () => {
+  // Creamos dos objetos link con las propiedades esperadas
+  const link1 = {
+    href: 'https://github.com/roxanna-sa/MD-links/blob/main/src/blob.js',
+    text: 'Ro',
+    file: 'C:/Users/Roxana/Desktop/Laboratoria Proyects/MD-links/md-files/test2/testing-links.md',
+  };
 
-describe('getLinksInFile', () => {
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
+  const link2 = {
+    href: 'https://www.google.com',
+    text: 'Google',
+    file: 'C:/Users/Roxana/Desktop/Laboratoria Proyects/MD-links/md-files/test2/testing-links.md',
+  };
 
-  it('should return the links from getLinksInFile', async () => {
-    // Definir el mock de la función getLinksInFile para que devuelva una lista de enlaces
-    const mockLinks = [
-      { href: 'https://example.com', text: 'Example Link 1', file: '/root/file1.md' },
-      { href: 'https://example.org', text: 'Example Link 2', file: '/root/file1.md' },
-    ];
-    // Configurar el mock correctamente para resolver la promesa con el valor deseado
-    getLinksInFile.mockResolvedValue(mockLinks);
+  const links = [link1, link2];
 
-    // Act
-    const result = await getLinksInFile('/root/file1.md');
+  // Mock de la función `validate` para simular las respuestas
+  jest.mock('../src/functions.js', () => ({
+    validate: jest.fn(link => {
+      if (link.href === 'https://github.com/roxanna-sa/MD-links/blob/main/src/blob.js') {
+        return Promise.resolve({
+          status: 404,
+          ok: 'fail',
+        });
+      } else {
+        return Promise.resolve({
+          status: 200,
+          ok: 'ok',
+        });
+      }
+    }),
+  }));
 
-    // Assert
-    expect(result).toEqual(mockLinks);
-    // Verificar que se haya llamado a la función getLinksInFile con el argumento correcto
-    expect(getLinksInFile).toHaveBeenCalledWith('/root/file1.md');
-  });
+  // Realizamos la validación de los enlaces
+  const result = await validateLinks(links);
 
+  // Comprobamos que los enlaces se hayan actualizado correctamente con los resultados de la validación
+  expect(result).toEqual([
+    {
+      href: 'https://github.com/roxanna-sa/MD-links/blob/main/src/blob.js',
+      text: 'Ro',
+      file: 'C:/Users/Roxana/Desktop/Laboratoria Proyects/MD-links/md-files/test2/testing-links.md',
+      status: 404,
+      ok: 'fail',
+    },
+    {
+      href: 'https://www.google.com',
+      text: 'Google',
+      file: 'C:/Users/Roxana/Desktop/Laboratoria Proyects/MD-links/md-files/test2/testing-links.md',
+      status: 200,
+      ok: 'ok',
+    },
+  ]);
 });
-

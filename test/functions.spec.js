@@ -1,13 +1,18 @@
-import { routeVerification,
-convertToAbsoluteRoute,
-isFileMd,
-isADirectory,
-getMdFilesFromDir,
-hasSubdirectories,
-getSubdirectories,
-processFilesRecursively,
-getMDFileRoutes,
- } from '../src/functions'
+import {
+  routeVerification,
+  convertToAbsoluteRoute,
+  isFileMd,
+  isADirectory,
+  getMdFilesFromDir,
+  hasSubdirectories,
+  getSubdirectories,
+  processFilesRecursively,
+  getMDFileRoutes,
+  getLinksInFile,
+  validate,
+  calculateStats,
+  truncateText
+} from '../src/functions'
 import path from 'path';
 import fs from 'fs'
 
@@ -28,7 +33,7 @@ test('La función routeVerification retorna false cuando la ruta no existe', () 
 describe('convertToAbsoluteRoute', () => {
   test('should return the absolute path when given an absolute path', () => {
 
-    const absolutePath =  path.resolve('C:\Users\Roxana\Desktop\Laboratoria Proyects\MD-links\md-files\test1');
+    const absolutePath = path.resolve('C:\Users\Roxana\Desktop\Laboratoria Proyects\MD-links\md-files\test1');
     expect(convertToAbsoluteRoute(absolutePath)).toEqual(absolutePath);
   });
 
@@ -358,7 +363,7 @@ describe('getMDFileRoutes', () => {
     // Eliminamos el directorio temporal después de todas las pruebas
     fs.rmdirSync(tempDir, { recursive: true });
   });
-  
+
   it('should add all .md file routes in the directory and its subdirectories to the routes array', () => {
     // Creamos una estructura de directorios de prueba
     const root = {
@@ -437,20 +442,244 @@ describe('getMDFileRoutes', () => {
   it('should handle invalid or non-existent path', () => {
     // Ruta que no existe
     const nonExistentPath = path.join(tempDir, 'nonexistent');
-  
+
     // Verificamos si la carpeta no existe y la creamos
     if (!fs.existsSync(nonExistentPath)) {
       fs.mkdirSync(nonExistentPath);
     }
-  
+
     // Definir un arreglo para almacenar las rutas de los archivos encontrados
     const routes = [];
-  
+
     // Act
     getMDFileRoutes(nonExistentPath, routes);
-  
+
     // Assert
     expect(routes).toEqual([]);
   });
 });
 
+describe('getLinksInFile', () => {
+  // Directorio temporal para las pruebas
+  let tempDir;
+
+  // Creamos el directorio temporal una vez antes de todas las pruebas
+  beforeAll(() => {
+    tempDir = path.resolve('./temp-dir');
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir);
+    }
+  });
+
+  beforeEach(() => {
+    // Limpiamos el directorio temporal antes de cada prueba
+    fs.rmdirSync(tempDir, { recursive: true });
+    fs.mkdirSync(tempDir);
+  });
+
+  afterAll(() => {
+    // Eliminamos el directorio temporal después de todas las pruebas
+    fs.rmdirSync(tempDir, { recursive: true });
+  });
+
+  it('should return an array of links when links are present in the file', () => {
+    // Ruta absoluta del archivo .md
+    const absoluteFilePath = path.join(tempDir, 'test.md');
+
+    // Contenido del archivo .md con enlaces
+    const mdContent = `
+      This is a sample Markdown file with links:
+      [Link 1](https://www.example.com)
+      [Link 2](https://www.google.com)
+    `;
+
+    // Creamos el archivo .md
+    fs.writeFileSync(absoluteFilePath, mdContent);
+
+    // Act
+    return getLinksInFile(absoluteFilePath)
+      .then((links) => {
+        // Assert
+        expect(links).toEqual([
+          {
+            href: 'https://www.example.com',
+            text: 'Link 1',
+            file: absoluteFilePath,
+          },
+          {
+            href: 'https://www.google.com',
+            text: 'Link 2',
+            file: absoluteFilePath,
+          },
+        ]);
+      });
+  });
+
+  it('should return an empty array when there are no links in the file', () => {
+    // Ruta absoluta del archivo .md
+    const absoluteFilePath = path.join(tempDir, 'test.md');
+
+    // Contenido del archivo .md sin enlaces
+    const mdContent = `
+      This is a sample Markdown file without links.
+    `;
+
+    // Creamos el archivo .md
+    fs.writeFileSync(absoluteFilePath, mdContent);
+
+    // Act
+    return getLinksInFile(absoluteFilePath)
+      .then((links) => {
+        // Assert
+        expect(links).toEqual([]);
+      });
+  });
+
+  it('should handle an error when there is an issue reading the file', () => {
+    // Ruta absoluta del archivo .md
+    const absoluteFilePath = path.join(tempDir, 'nonexistent.md');
+
+    // Act
+    return getLinksInFile(absoluteFilePath)
+      .catch((error) => {
+        // Assert
+        expect(error).toBeDefined();
+      });
+  });
+});
+
+describe('validate', () => {
+
+  test('should be a function', async () => {
+    expect(typeof validate).toBe('function');
+  });
+
+  test('should return an array of link objects with href, text, file, status, and ok properties', async () => {
+
+    const expectedResponse = [
+      {
+        href: 'https://github.com/roxanna-sa/MD-links/blob/main/src/blob.js',
+        text: 'Ro',
+        file: 'C:/Users/Roxana/Desktop/Laboratoria Proyects/MD-links/md-files/test2/testing-links.md',
+        status: 404,
+        ok: 'fail',
+      },
+      {
+        href: 'https://www.google.com',
+        text: 'Google',
+        file: 'C:/Users/Roxana/Desktop/Laboratoria Proyects/MD-links/md-files/test2/testing-links.md',
+        status: 200,
+        ok: 'ok',
+      },
+    ];
+
+    // Crear los objetos link con las propiedades esperadas
+    const link1 = {
+      href: 'https://github.com/roxanna-sa/MD-links/blob/main/src/blob.js',
+      text: 'Ro',
+      file: 'C:/Users/Roxana/Desktop/Laboratoria Proyects/MD-links/md-files/test2/testing-links.md',
+    };
+
+    const link2 = {
+      href: 'https://www.google.com',
+      text: 'Google',
+      file: 'C:/Users/Roxana/Desktop/Laboratoria Proyects/MD-links/md-files/test2/testing-links.md',
+    };
+
+    // Hacer la validación individual de cada link
+    const result1 = await validate(link1);
+    const result2 = await validate(link2);
+
+    // Comprobar que los resultados sean los esperados
+    expect(result1).toEqual(expectedResponse[0]);
+    expect(result2).toEqual(expectedResponse[1]);
+  });
+});
+
+function captureConsoleOutput(callback) {
+  const originalConsoleLog = console.log;
+  const logs = [];
+
+  console.log = (...args) => {
+    logs.push(...args);
+  };
+
+  callback();
+
+  console.log = originalConsoleLog;
+  return logs;
+}
+
+describe('calculateStats', () => {
+  test('should print total and unique link counts when options.stats is true', () => {
+    const links = [
+      { href: 'https://example.com/page1', ok: 'ok' },
+      { href: 'https://example.com/page2', ok: 'ok' },
+      { href: 'https://example.com/page1', ok: 'fail' },
+    ];
+
+    const options = {
+      stats: true,
+    };
+
+    const logs = captureConsoleOutput(() => {
+      calculateStats(links, options);
+    });
+
+    expect(logs).toEqual(['Total: 3', 'Unique: 2']);
+  });
+
+  test('should print total, unique, and broken link counts when options.stats and options.validate are true', () => {
+    const links = [
+      { href: 'https://example.com/page1', ok: 'ok' },
+      { href: 'https://example.com/page2', ok: 'fail' },
+      { href: 'https://example.com/page1', ok: 'fail' },
+    ];
+
+    const options = {
+      stats: true,
+      validate: true,
+    };
+
+    const logs = captureConsoleOutput(() => {
+      calculateStats(links, options);
+    });
+
+    expect(logs).toEqual(['Total: 3', 'Unique: 2', 'Broken: 2']);
+  });
+
+  test('should not print anything when options.stats is false', () => {
+    const links = [
+      { href: 'https://example.com/page1', ok: 'ok' },
+      { href: 'https://example.com/page2', ok: 'ok' },
+    ];
+
+    const options = {
+      stats: false,
+    };
+
+    const logs = captureConsoleOutput(() => {
+      calculateStats(links, options);
+    });
+
+    expect(logs).toEqual([]);
+  });
+});
+
+describe('truncateText', () => {
+  test('should return the same text when its length is less than or equal to 50', () => {
+    const text1 = 'This is a short text.';
+    const text2 = 'I am a longer text compared to the one before';
+
+    expect(truncateText(text1)).toStrictEqual(text1);
+    expect(truncateText(text2)).toStrictEqual(text2);
+  });
+
+  test('should truncate text to 50 characters', () => {
+    const longText = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sodales ex a suscipit interdum.';
+    const truncatedText = truncateText(longText);
+
+    expect(truncatedText.length).toBe(53); // 50 characters + 3 ellipsis
+    expect(truncatedText).toBe('Lorem ipsum dolor sit amet, consectetur adipiscing...');
+  });
+});
