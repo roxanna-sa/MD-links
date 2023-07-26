@@ -206,5 +206,11 @@ export function truncateText(text) {
   if (text.length <= 50) {
     return text;
   }
-  return `${text.slice(0, 50)}...`;
+  
+  const truncatedText = text.slice(0, 50);
+  if (truncatedText.endsWith('...')) {
+    return truncatedText.slice(0, -3);
+  }
+
+  return `${truncatedText}...`;
 }
