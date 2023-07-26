@@ -90,7 +90,6 @@ export const getLinks = (filePath) => new Promise((resolve, reject) => {
  * @param {*} absolutePath - donde estamos procesando
  */
 export const processFilesRecursively = (routes, absolutePath) => {
-  //console.log('absolutePath', absolutePath);
   routes.push(...getMdFilesFromDir(absolutePath))
   const subdirectories = getSubdirectories(absolutePath);
   subdirectories.forEach(directory => {
