@@ -3,5 +3,5 @@
 [Ro]("https://github.com/roxanna-sa/MD-links/blob/main/src/blob.js")
 [Google]("https://www.google.com/")
 [RepoBroken]("https://github.com/roxanna-sa/fantasy")
-[Google2]("https://www.google.com/")
+[Google2EsteTexto Es Mas Largo De Lo Que Deberia Para Poder Probar El Truncate Text]("https://www.google.com/")
 [Ro]("https://github.com/roxanna-sa/MD-links/blob/main/src/blob.js")
