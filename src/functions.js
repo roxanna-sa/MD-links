@@ -84,6 +84,8 @@ export const getLinks = (filePath) => new Promise((resolve, reject) => {
   });
 });
 
+
+// Procesar recursivamente
 /**
  * 
  * @param {*} routes - arreglo donde guardaremos las rutas (se pasa como referencia)
@@ -97,29 +99,25 @@ export const processFilesRecursively = (routes, absolutePath) => {
   });
 }
 
+// Obtener las rutas de los archivos .md
 export const getMDFileRoutes = (path, routes) => {
-  //verificar si ruta es absoluta, en caso de que no, transformar.
+  // Verificar si ruta es absoluta, en caso de que no, transformar.
   const absolutePath = convertToAbsoluteRoute(path);
-  //console.log(`Absolute route: ${absolutePath}`); //*borrar a futuro
 
   const isDirectoryResult = isADirectory(absolutePath);
-  //console.log((`¿Is a directory?: ${isDirectoryResult}`)); //*borrar a futuro
 
   if (isDirectoryResult) {
     processFilesRecursively(routes, absolutePath);
   } else {
     // Si es un archivo...
     const isAFileMd = isFileMd(absolutePath);
-    //console.log(`¿Is it a .md?: ${isAFileMd}`);
     if (!isAFileMd) {
-      //console.log('It is not a .md file');
-      reject('It is not a .md file');
-      return;
+      console.warn(`Warning: ${absolutePath} is not a .md file and will be skipped.`);
+    } else {
+      routes.push(absolutePath);
     }
-
-    routes.push(absolutePath);
   }
-}
+};
 
 // Obtener los enlaces en un archivo MD
 export const getLinksInFile = (currentMdFile) => {
@@ -130,6 +128,7 @@ export const getLinksInFile = (currentMdFile) => {
     });
 };
 
+// validate
 export const validate = (link) => axios.get(link.href)
   .then(response => ({
     href: link.href,
@@ -182,6 +181,7 @@ export const getLinksAndValidate = (routes, options) => {
     });
 };
 
+// Calcular los stats
 export const calculateStats = (links, options) => {
   if (!options.stats) {
     return;
