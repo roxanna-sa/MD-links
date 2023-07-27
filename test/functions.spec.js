@@ -444,6 +444,37 @@ describe('getMDFileRoutes', () => {
 
     expect(routes).toEqual([]);
   });
+  
+  it('should not add non-.md files to the routes array', () => {
+    // Ruta absoluta de un archivo que no es .md
+    const absoluteFilePath = path.join(tempDir, 'not_md.txt');
+
+    // Creamos un archivo que no es .md
+    fs.writeFileSync(absoluteFilePath, '');
+
+    // Definir un arreglo para almacenar las rutas de los archivos encontrados
+    const routes = [];
+
+    getMDFileRoutes(absoluteFilePath, routes);
+
+    expect(routes).toEqual([]);
+  });
+
+  it('should handle non-.md file path', () => {
+    // Ruta absoluta de un archivo que no es .md
+    const absoluteFilePath = path.join(tempDir, 'not_md.txt');
+
+    // Creamos un archivo que no es .md
+    fs.writeFileSync(absoluteFilePath, '');
+
+    // Definir un arreglo para almacenar las rutas de los archivos encontrados
+    const routes = [];
+
+    getMDFileRoutes(absoluteFilePath, routes);
+
+    expect(routes).toEqual([]);
+  });
+
 });
 
 // GET LINKS IN FILE
