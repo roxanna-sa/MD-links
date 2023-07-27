@@ -1,17 +1,23 @@
 {
   "type": "module",
-  "name": "md-links",
-  "version": "0.1.0",
+  "name": "roxana-soto-md-links",
+  "version": "1.0.0",
+  "description": "Markdown search library",
+  "main": "dist/index.js",
   "engines": {
     "node": ">=16.x"
   },
+
+  "bin": {
+    "md-links": "dist/cli.js"
+  },
+  
   "bootcamp": {
     "createdAt": "2023-06-20T14:05:58.211Z",
     "version": "6.3.0",
     "commit": "e129ade681adff8cbb19f82e63f688fef2f08f32"
   },
-  "description": "Markdown search lib",
-  "main": "src/cli.js",
+  
   "directories": {
     "test": "jest --verbose --coverage"
   },
@@ -20,12 +26,18 @@
     "stylelint": "stylelint --aei src/**/*.css",
     "test": "jest --coverage",
     "start": "babel-node src/index.js",
-    "build": "babel src -d lib",
+    "build": "babel src -d dist",
     "prepublishOnly": "npm run build",
     "cli": "babel-node src/cli.js"
   },
-  "keywords": [],
-  "author": "",
+
+  "keywords": [
+    "markdown",
+    "links",
+    "md-links"
+  ],
+
+  "author": "Roxana Soto Acosta",
   "license": "ISC",
   "devDependencies": {
     "@babel/cli": "^7.22.9",
@@ -44,14 +56,18 @@
     "jest": "^29.6.1",
     "standard": "^17.1.0"
   },
+
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/roxanna-sa/MD-links"
+  },
+
   "dependencies": {
     "@babel/eslint-parser": "^7.22.9",
     "axios": "^1.4.0",
     "chalk": "^5.3.0",
     "figlet": "^1.6.0",
     "lolcatjs": "^2.4.1"
-  },
-  "bin": {
-    "md-links": "src/cli.js"
   }
+
 }
