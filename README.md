@@ -52,18 +52,87 @@ Flowchart used for the project development.
 
 ## 5. Use as a Javascript API
 
+The module can be imported into other Node.js scripts and provides the following interface:
+
+### <u>mdLinks (path, options)</u>
+
+Arguments
+* path: Absolute or relative path to the directory.
+* options: An object with the following property:
+* validate: A boolean that determines whether to validate the found links.
+
+### <u>Return Value</u>
+
+If validate = false:
+
+* href: Found URL.
+* text: Text that appears inside the link.
+* file: Absolute path of the file where the link was found.
+
+If validate = true:
+
+* href: Found URL.
+* text: Text that appeared inside the link.
+* file: Absolute path of the file where the link was found.
+* status: HTTP response code.
+* ok: "fail" message in case of failure or "ok" in case of success.
+
 
 ## 6. Use as a Command Line Interface
 
-<img src='./Readme%20img/noRoute.png'>
+### <u>Installation:</u>
 
-<img src='./Readme%20img/pathNoExist.png'>
+`npm install <github-user>/md-links`
+
+### <u>The CLI is executed in the following way in the terminal:</u>
+
+`md-links <path-to-file> [options]`
+
+The default behavior does not validate if the URLs respond; it only identifies the .md files, analyzes them, and prints the found links, along with the file path and the text inside the link (truncated to 50 characters).
+
+See image below.
+* Provided route: ../md-files/
 
 <img src='./Readme%20img/onlyARoute.png'>
 
-<img src='./Readme%20img/routeAndStats.png'>
+### Options:
+* If no path is provided, it will indicate an error: "There is no route".
+
+See image below.
+* Provided route: none
+
+
+<img src='./Readme%20img/noRoute.png'>
+
+* If an invalid path is provided, it will indicate an error: "Path does not exist"
+
+See image below.
+* Provided route: inexistent path,
+
+<img src='./Readme%20img/pathNoExist.png'>
+
+--validate:
+* If the --validate option is provided, the module will make an HTTP request to check if the link works or not. If the link results in a redirection to a URL that responds with "ok," then the link will be considered as "ok."
+
+See image below.
+* Provided route and option: ../md-files/ --validate
+
 
 <img src='./Readme%20img/routeAndValidate.png'>
+
+--stats:
+* If the --stats option is provided, the output will be text with basic statistics about the links (Total & Unique).
+
+See image below.
+* Provided route and option: ../md-files/ --stats
+
+<img src='./Readme%20img/routeAndStats.png'>
+
+
+If both the --stats and --validate options are used together, it will provide both the statistics and the validation results.
+
+See image below.
+* Provided route and option: ../md-files/ --validate --stats
 
 <img src='./Readme%20img/statsAndValidate.png'>
 
