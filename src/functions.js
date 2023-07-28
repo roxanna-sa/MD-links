@@ -1,3 +1,7 @@
+/* eslint-disable max-len */
+/* eslint-disable no-console */
+/* eslint-disable no-shadow */
+/* eslint-disable no-param-reassign */
 import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
@@ -16,16 +20,12 @@ export function routeVerification(path) {
 export const convertToAbsoluteRoute = (filePath) => {
   if (path.isAbsolute(filePath)) {
     return filePath;
-  } else {
-    return path.resolve(filePath)
-
   }
+  return path.resolve(filePath);
 };
 
 // Validar si es un archivo md
-export const isFileMd = (filePath) => {
-  return (path.extname(filePath) === ".md");
-};
+export const isFileMd = (filePath) => (path.extname(filePath) === '.md');
 
 // Revisar si es una carpeta
 export function isADirectory(pathUser) {
@@ -35,10 +35,9 @@ export function isADirectory(pathUser) {
 
 export function getMdFilesFromDir(folderPath) {
   try {
-    const fileNames = fs.readdirSync(folderPath).filter(x => x.endsWith('.md'));
-    const filePaths = fileNames.map(fileName =>
-      convertToAbsoluteRoute(path.join(folderPath, fileName))
-    );
+    const fileNames = fs.readdirSync(folderPath).filter((x) => x.endsWith('.md'));
+    const filePaths = fileNames.map((fileName) => convertToAbsoluteRoute(path.join(folderPath, fileName)));
+
     return filePaths;
   } catch (error) {
     console.error('Error al obtener los archivos:', error);
@@ -46,17 +45,17 @@ export function getMdFilesFromDir(folderPath) {
   }
 }
 
-//¿Hay más carpetas dentro de path?
+// ¿Hay más carpetas dentro de path?
 export function hasSubdirectories(directory) {
-  return fs.readdirSync(directory).some(item => fs.lstatSync(`${directory}/${item}`).isDirectory());
+  return fs.readdirSync(directory).some((item) => fs.lstatSync(`${directory}/${item}`).isDirectory());
 }
 
 export function getSubdirectories(directory) {
-  const directories = fs.readdirSync(directory).filter(item => fs.lstatSync(`${directory}/${item}`).isDirectory());
-  return directories.map(subDirectory => convertToAbsoluteRoute(path.join(directory, subDirectory)));
+  const directories = fs.readdirSync(directory).filter((item) => fs.lstatSync(`${directory}/${item}`).isDirectory());
+  return directories.map((subDirectory) => convertToAbsoluteRoute(path.join(directory, subDirectory)));
 }
 
-//obtener links
+// Obtener links
 export const getLinks = (filePath) => new Promise((resolve, reject) => {
   const newLinksMd = [];
 
@@ -68,12 +67,12 @@ export const getLinks = (filePath) => new Promise((resolve, reject) => {
 
       const regex = /\[(.+?)\].*(https?:\/\/[^\s)]+)\)/g;
       let match = regex.exec(data);
-      //si el archivo contiene Links debe retornar un array de links
+      // si el archivo contiene Links debe retornar un array de links
       while (match != null) {
         newLinksMd.push({
-          href: match[2].replace(/"/g, ""), //almacena el valor de la segunda coincidencia capturada por la expresión regular. El segundo grupo capturado corresponde a la URL del enlace.
-          text: match[1], //almacena el valor de la primera coincidencia capturada por la expresión regular. El primer grupo capturado corresponde al texto del enlace
-          file: filePath, //almacena el valor del parámetro filePath que se pasó a la función getLinks. Representa la ruta del archivo en el que se encontró el enlace.
+          href: match[2].replace(/"/g, ''), // almacena el valor de la segunda coincidencia capturada por la expresión regular. El segundo grupo capturado corresponde a la URL del enlace.
+          text: match[1], // almacena el valor de la primera coincidencia capturada por la expresión regular. El primer grupo capturado corresponde al texto del enlace
+          file: filePath, // almacena el valor del parámetro filePath que se pasó a la función getLinks. Representa la ruta del archivo en el que se encontró el enlace.
         });
         match = regex.exec(data);
       }
@@ -84,26 +83,24 @@ export const getLinks = (filePath) => new Promise((resolve, reject) => {
   });
 });
 
-
 // Procesar recursivamente
 /**
- * 
+ *
  * @param {*} routes - arreglo donde guardaremos las rutas (se pasa como referencia)
  * @param {*} absolutePath - donde estamos procesando
  */
 export const processFilesRecursively = (routes, absolutePath) => {
-  routes.push(...getMdFilesFromDir(absolutePath))
+  routes.push(...getMdFilesFromDir(absolutePath));
   const subdirectories = getSubdirectories(absolutePath);
-  subdirectories.forEach(directory => {
+  subdirectories.forEach((directory) => {
     processFilesRecursively(routes, directory);
   });
-}
+};
 
 // Obtener las rutas de los archivos .md
 export const getMDFileRoutes = (path, routes) => {
   // Verificar si ruta es absoluta, en caso de que no, transformar.
   const absolutePath = convertToAbsoluteRoute(path);
-
   const isDirectoryResult = isADirectory(absolutePath);
 
   if (isDirectoryResult) {
@@ -120,44 +117,42 @@ export const getMDFileRoutes = (path, routes) => {
 };
 
 // Obtener los enlaces en un archivo MD
-export const getLinksInFile = (currentMdFile) => {
-  return getLinks(currentMdFile)
-    .catch(error => {
-      console.error('Error al obtener links en el archivo:', error);
-      return [];
-    });
-};
+export const getLinksInFile = (currentMdFile) => getLinks(currentMdFile)
+  .catch((error) => {
+    console.error('Error al obtener links en el archivo:', error);
+    return [];
+  });
 
 // validate
 export const validate = (link) => axios.get(link.href)
-  .then(response => ({
+  .then((response) => ({
     href: link.href,
     text: link.text,
     file: link.file,
     status: response.status,
-    ok: response.status >= 200 && response.status < 400 ? 'ok' : 'fail'
+    ok: response.status >= 200 && response.status < 400 ? 'ok' : 'fail',
   }))
-  .catch(error => ({
+  .catch((error) => ({
     href: link.href,
     text: link.text,
     file: link.file,
     status: error.response ? error.response.status : null,
-    ok: 'fail'
+    ok: 'fail',
   }));
 
 // Realizar la validación para un array de enlaces
 export const validateLinks = (links) => {
-  const linkValidations = links.map(link => validate(link));
+  const linkValidations = links.map((link) => validate(link));
   return Promise.all(linkValidations)
-    .then(validations => {
+    .then((validations) => {
       validations.forEach((validation, index) => {
         // Agregar validaciones a link que es lo que se devuelve al usuario que usó finalmente:
-        links[index]["status"] = validation.status;
-        links[index]["ok"] = validation.ok;
+        links[index].status = validation.status;
+        links[index].ok = validation.ok;
       });
       return links;
     })
-    .catch(error => {
+    .catch((error) => {
       console.error('Error during link validation:', error);
       return links;
     });
@@ -166,18 +161,17 @@ export const validateLinks = (links) => {
 // Obtener los links en los archivos MD y validarlos si es necesario
 export const getLinksAndValidate = (routes, options) => {
   if (routes.length === 0) {
-    return Promise.reject('"Error: There are no .md files');
+    return Promise.reject(new Error('There are no .md files'));
   }
 
-  const linksPromises = routes.map(currentMdFile => getLinksInFile(currentMdFile));
+  const linksPromises = routes.map((currentMdFile) => getLinksInFile(currentMdFile));
   return Promise.all(linksPromises)
-    .then(linksArray => linksArray.flat())
-    .then(links => {
+    .then((linksArray) => linksArray.flat())
+    .then((links) => {
       if (options.validate) {
         return validateLinks(links);
-      } else {
-        return links;
       }
+      return links;
     });
 };
 
@@ -206,7 +200,7 @@ export function truncateText(text) {
   if (text.length <= 50) {
     return text;
   }
-  
+
   const truncatedText = text.slice(0, 50);
   if (truncatedText.endsWith('...')) {
     return truncatedText.slice(0, -3);
