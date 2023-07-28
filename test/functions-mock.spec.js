@@ -1,6 +1,7 @@
-import { validateLinks,
-getLinks } from '../src/functions';
-
+import {
+  validateLinks,
+  getLinks,
+} from '../src/functions';
 
 test('should update status and ok properties for each link', async () => {
   // Crear dos objetos link con las propiedades esperadas
@@ -20,18 +21,17 @@ test('should update status and ok properties for each link', async () => {
 
   // Mock de la función `validate` para simular las respuestas
   jest.mock('../src/functions.js', () => ({
-    validate: jest.fn(link => {
+    validate: jest.fn((link) => {
       if (link.href === 'https://github.com/roxanna-sa/MD-links/blob/main/src/blob.js') {
         return Promise.resolve({
           status: 404,
           ok: 'fail',
         });
-      } else {
-        return Promise.resolve({
-          status: 200,
-          ok: 'ok',
-        });
       }
+      return Promise.resolve({
+        status: 200,
+        ok: 'ok',
+      });
     }),
   }));
 
@@ -56,7 +56,6 @@ test('should update status and ok properties for each link', async () => {
     },
   ]);
 });
-
 
 jest.mock('fs', () => ({
   readFile: (filePath, encoding, callback) => {
@@ -97,5 +96,3 @@ describe('getLinks', () => {
     await expect(getLinks(filePath)).rejects.toThrow('File not found');
   });
 });
-
-

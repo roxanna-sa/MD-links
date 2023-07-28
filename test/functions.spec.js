@@ -1,3 +1,5 @@
+import path from 'path';
+import fs from 'fs';
 import {
   routeVerification,
   convertToAbsoluteRoute,
@@ -11,32 +13,29 @@ import {
   getLinksInFile,
   validate,
   calculateStats,
-  truncateText
-} from '../src/functions'
-import path from 'path';
-import fs from 'fs'
+  truncateText,
+} from '../src/functions';
 
 // ROUTE VERIFICATION
-describe('routeVerification' , () => {
+describe('routeVerification', () => {
   test('routeVerification returns true when there is an existing path', () => {
     const existingPath = './src';
     const result = routeVerification(existingPath);
-  
+
     expect(result).toBe(true);
   });
-  
+
   test('routeVerification returns false when the path does not exist', () => {
     const nonExistentPath = '../hello.js';
     const result = routeVerification(nonExistentPath);
-  
+
     expect(result).toBe(false);
   });
-})
+});
 
 // CONVERT TO ABSOLUTE ROUTE
 describe('convertToAbsoluteRoute', () => {
   test('should return the absolute path when given an absolute path', () => {
-
     const absolutePath = path.resolve('C:\Users\Roxana\Desktop\Laboratoria Proyects\MD-links\md-files\test1');
     expect(convertToAbsoluteRoute(absolutePath)).toEqual(absolutePath);
   });
@@ -89,14 +88,12 @@ describe('isADirectory', () => {
   });
 
   it('should return true when the path points to a directory', () => {
- 
     const result = isADirectory(testFolderPath);
 
     expect(result).toBe(true);
   });
 
   it('should return false when the path points to a file', () => {
- 
     const filePath = path.join(testFolderPath, 'test-file.txt');
     fs.writeFileSync(filePath, 'This is a test file.');
 
@@ -125,7 +122,7 @@ describe('getMdFilesFromDir', () => {
     const fileNames = ['file1.txt', 'file2.md', 'file3.js'];
 
     // Create test files inside the temporary folder and get the absolute file path of 'file2.md'
-    fileNames.forEach(fileName => {
+    fileNames.forEach((fileName) => {
       fs.writeFileSync(path.join(folderPath, fileName), '');
     });
 
@@ -140,7 +137,7 @@ describe('getMdFilesFromDir', () => {
     const fileNames = ['file1.txt', 'file2.js'];
 
     // Crea archivo de prueba dentro de la carpeta
-    fileNames.forEach(fileName => {
+    fileNames.forEach((fileName) => {
       fs.writeFileSync(path.join(folderPath, fileName), '');
     });
 
@@ -161,7 +158,6 @@ describe('getMdFilesFromDir', () => {
 // HAS SUBDIRECTORIES
 describe('hasSubdirectories', () => {
   it('should return true when the directory contains subdirectories', () => {
-
     const directoryPath = './test-folder';
     const subdirectoryName = 'subdir';
 
@@ -179,7 +175,6 @@ describe('hasSubdirectories', () => {
   });
 
   it('should return false when the directory does not contain subdirectories', () => {
-
     const directoryPath = './test-folder';
 
     // Crea una carpeta temporal para el test
@@ -192,10 +187,9 @@ describe('hasSubdirectories', () => {
     // Cleanup
     fs.rmdirSync(directoryPath);
   });
-
 });
 
-//GET SUBDIRECTORIES
+// GET SUBDIRECTORIES
 describe('getSubdirectories', () => {
   beforeEach(() => {
     // Crea una carpeta temporal antes de cada prueba
@@ -208,31 +202,28 @@ describe('getSubdirectories', () => {
   });
 
   it('should return an array of absolute paths to subdirectories when given a valid directory path', () => {
-  
     const directoryPath = './test-folder';
     const subdirectoryNames = ['subdir1', 'subdir2', 'subdir3'];
 
     // Crea los subdirectorios dentro de la carpeta temporal para la prueba
-    subdirectoryNames.forEach(subdirName => fs.mkdirSync(`${directoryPath}/${subdirName}`));
+    subdirectoryNames.forEach((subdirName) => fs.mkdirSync(`${directoryPath}/${subdirName}`));
 
     const result = getSubdirectories(directoryPath);
 
-    const expectedPaths = subdirectoryNames.map(subdir => convertToAbsoluteRoute(`${directoryPath}/${subdir}`));
+    const expectedPaths = subdirectoryNames.map((subdir) => convertToAbsoluteRoute(`${directoryPath}/${subdir}`));
     expect(result).toEqual(expectedPaths);
   });
 
   it('should return an empty array when given a directory with no subdirectories', () => {
-
     const directoryPath = './test-folder';
 
     const result = getSubdirectories(directoryPath);
 
     expect(result).toEqual([]);
   });
-
 });
 
-//PROCESS FILES RECURSIVELY
+// PROCESS FILES RECURSIVELY
 describe('processFilesRecursively', () => {
   // Directorio temporal para las pruebas
   let tempDir;
@@ -318,7 +309,6 @@ describe('processFilesRecursively', () => {
     ]);
   });
 
-
   it('should handle empty directory', () => {
     // Definir un arreglo para almacenar las rutas de los archivos encontrados
     const routes = [];
@@ -332,12 +322,10 @@ describe('processFilesRecursively', () => {
   });
 });
 
-
 // GET MD FILE ROUTES
 describe('getMDFileRoutes', () => {
   // Directorio temporal para las pruebas
   let tempDir;
-
   // Crear el directorio temporal una vez antes de todas las pruebas
   beforeAll(() => {
     tempDir = path.resolve('./temp-dir');
@@ -444,7 +432,7 @@ describe('getMDFileRoutes', () => {
 
     expect(routes).toEqual([]);
   });
-  
+
   it('should not add non-.md files to the routes array', () => {
     // Ruta absoluta de un archivo que no es .md
     const absoluteFilePath = path.join(tempDir, 'not_md.txt');
@@ -474,14 +462,12 @@ describe('getMDFileRoutes', () => {
 
     expect(routes).toEqual([]);
   });
-
 });
 
 // GET LINKS IN FILE
 describe('getLinksInFile', () => {
   // Directorio temporal para las pruebas
   let tempDir;
-
   // Crear el directorio temporal una vez antes de todas las pruebas
   beforeAll(() => {
     tempDir = path.resolve('./temp-dir');
@@ -517,7 +503,6 @@ describe('getLinksInFile', () => {
 
     return getLinksInFile(absoluteFilePath)
       .then((links) => {
-      
         expect(links).toEqual([
           {
             href: 'https://www.example.com',
@@ -566,13 +551,11 @@ describe('getLinksInFile', () => {
 
 // VALIDATE
 describe('validate', () => {
-
   test('should be a function', async () => {
     expect(typeof validate).toBe('function');
   });
 
   test('should return an array of link objects with href, text, file, status, and ok properties', async () => {
-
     const expectedResponse = [
       {
         href: 'https://github.com/roxanna-sa/MD-links/blob/main/src/blob.js',
@@ -612,7 +595,6 @@ describe('validate', () => {
     expect(result2).toEqual(expectedResponse[1]);
   });
 });
-
 
 // CALCULATE STATS
 
