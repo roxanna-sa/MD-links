@@ -152,6 +152,8 @@ See image below.
 
 ## 9. Unit tests using Jest
 
+Required 70% coverage
+
 <img src='./Readme%20img/testingMdLinks.png'>
 
 ## 10. Download
