@@ -57,9 +57,10 @@ The module can be imported into other Node.js scripts and provides the following
 ### <u>mdLinks (path, options)</u>
 
 Arguments
-* path: Absolute or relative path to the directory.
-* options: An object with the following property:
-* validate: A boolean that determines whether to validate the found links.
+* `path`: Absolute or relative path to the directory.
+* `options`: An object with the following property:
+   - `validate`: A boolean that determines whether to validate the found links.
+
 
 ### <u>Return Value</u>
 
