@@ -139,13 +139,13 @@ See image below.
 
 ## 7. Used libraries
 
-* File system : This module is a built-in Node.js module that provides an API for interacting with the file system on the local machine. It allows developers to perform various file-related operations, such as reading from and writing to files, creating and deleting directories, and modifying file permissions.
+* `File system` : It is a built-in Node.js module that provides an API for interacting with the file system on the local machine. It allows to perform various file-related operations, such as reading from and writing to files, creating and deleting directories, and modifying file permissions.
 
-* Axios : It is a popular JavaScript library used for making HTTP requests from both the browser and Node.js environments. It provides a simple and intuitive interface to perform HTTP calls, supporting features like Promise-based requests, request and response interception, automatic JSON data transformation, and handling request cancellation.
+* `Axios` : It is a popular JavaScript library used for making HTTP requests from both the browser and Node.js environments. It provides a simple and intuitive interface to perform HTTP calls, supporting features like Promise-based requests, request and response interception, automatic JSON data transformation, and handling request cancellation.
 
-* Chalk : A Node.js library used for styling terminal text with colors and styles. It allows to apply different text colors, background colors, and text styles (e.g., bold, italic) to enhance the readability and presentation of output in the terminal or command-line interface.
+* `Chalk` : A Node.js library used for styling terminal text with colors and styles. It allows to apply different text colors, background colors, and text styles (e.g., bold, italic) to enhance the readability and presentation of output in the terminal or command-line interface.
 
-* Figlet : JavaScript library that converts text into stylized ASCII art. It takes a string of characters as input and generates a larger version of the text using various ASCII characters and symbols, creating an artistic representation of the input text. It is often used to add a decorative touch to command-line interfaces and console applications.
+* `Figlet` : JavaScript library that converts text into stylized ASCII art. It takes a string of characters as input and generates a larger version of the text using various ASCII characters and symbols, creating an artistic representation of the input text. It is often used to add a decorative touch to command-line interfaces and console applications.
 
 
 ## 8. Usability testing on different operating systems
