@@ -47,7 +47,7 @@ Summarizing, anyone using Markdown files and wishing to keep track of valid or b
 
 Flowchart used for the project development.
 
-<img src='./Readme img/flowchart.png'>
+<img src='./Readme img/Flowchart.png'>
 
 
 ## 5. Use as a Javascript API
