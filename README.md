@@ -1,6 +1,6 @@
 # Markdown Links
 
-## Índice
+## Index
 
 * [1. Preface](#1-preface)
 * [2. Summary](#2-summary)
@@ -47,7 +47,7 @@ Summarizing, anyone using Markdown files and wishing to keep track of valid or b
 
 Flowchart used for the project development.
 
-<img src='./Readme%20img/flowchart.png'>
+<img src='./Readme img/flowchart.png'>
 
 
 ## 5. Use as a Javascript API
