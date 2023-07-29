@@ -83,7 +83,7 @@ If validate = true:
 
 ### <u>Installation:</u>
 
-`npm install <github-user>/md-links`
+`npm i roxana-soto-md-links`
 
 ### <u>The CLI is executed in the following way in the terminal:</u>
 
