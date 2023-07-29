@@ -7,7 +7,7 @@ import { calculateStats, truncateText } from './functions.js';
 // Función para mostrar el mensaje de MDlinks en ASCII art
 const showBanner = () => {
   const bannerText = figlet.textSync('Md-Links', {
-    font: 'big',
+    font: 'colossal',
     horizontalLayout: 'default',
     verticalLayout: 'default',
   });
