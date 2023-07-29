@@ -3,13 +3,13 @@
   "name": "roxana-soto-md-links",
   "version": "1.0.0",
   "description": "Markdown search library",
-  "main": "dist/index.js",
+  "main": "src/index.js",
   "engines": {
     "node": ">=16.x"
   },
 
   "bin": {
-    "md-links": "dist/cli.js"
+    "md-links": "src/cli.js"
   },
   
   "bootcamp": {
