@@ -150,6 +150,26 @@ See image below.
 
 ## 8. Usability testing on different operating systems
 
+### Usability testing conducted on:
+
+`Windows 10: passed`
+
+`MacOS: passed`
+
+`Ubuntu Linux: Error (Figlet)`
+
+### The font of the Md-Links banner is changed from Big to Colossal to improve compatibility.
+
+`Windows: passed`
+
+`MacOS: passed`
+
+`Ubuntu Linux: passed`
+
+
+<img src='./Readme%20img/noRouteLinux.png'>
+
+<img src='./Readme%20img/validateStatsLinux.png'>
 
 ## 9. Unit tests using Jest
 
