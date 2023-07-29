@@ -158,9 +158,9 @@ See image below.
 
 `Ubuntu Linux: Error (Figlet)`
 
-### The font of the Md-Links banner is changed from Big to Colossal to improve compatibility.
+### <u> The font of the Md-Links banner is changed from Big to Colossal to improve compatibility.</u>
 
-`Windows: passed`
+`Windows 10: passed`
 
 `MacOS: passed`
 
