@@ -177,5 +177,6 @@ Required 70% coverage
 
 <img src='./Readme%20img/testingMdLinks.png'>
 
-## 10. Download
+## 10. Install
 
+`npm i roxana-soto-md-links`
