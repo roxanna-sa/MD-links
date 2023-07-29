@@ -10,8 +10,8 @@
 * [6. Use as a Command Line Interface](#6-use-as-a-command-line-interface)
 * [7. Used libraries](#7-used-libraries)
 * [8. Usability testing on different operating systems](#8-usability-testing-on-different-operating-systems)
-* [9. Unit tests using Jest ](#9-unit-test-using-Jest)
-* [10. Download](#10-download)
+* [9. Unit test using Jest ](#9-unit-test-using-jest)
+* [10. Install](#10-install)
 
 ***
 
@@ -171,7 +171,7 @@ See image below.
 
 <img src='./Readme%20img/validateStatsLinux.png'>
 
-## 9. Unit tests using Jest
+## 9. Unit test using Jest
 
 Required 70% coverage
 
