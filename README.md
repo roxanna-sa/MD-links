@@ -1,6 +1,4 @@
 # Markdown Links Identifier 
-<img src='./Readme%20img/markdown.jpg'>
-
 ## Index
 
 * [1. Preface](#1-preface)
